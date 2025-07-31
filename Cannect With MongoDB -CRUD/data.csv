@@ -1,0 +1,12 @@
+[
+  { "name": "Abhishek", "marks": 85, "status": "Pass" },
+  { "name": "Ravi", "marks": 42, "status": "Fail" },
+  { "name": "Sita", "marks": 76, "status": "Pass" },
+  { "name": "John", "marks": 90, "status": "Pass" },
+  { "name": "Priya", "marks": 55, "status": "Pass" },
+  { "name": "Amit", "marks": 33, "status": "Fail" },
+  { "name": "Neha", "marks": 67, "status": "Pass" },
+  { "name": "Rahul", "marks": 48, "status": "Fail" },
+  { "name": "Pooja", "marks": 72, "status": "Pass" },
+  { "name": "Karan", "marks": 29, "status": "Fail" }
+]
