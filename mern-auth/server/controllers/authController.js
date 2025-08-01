@@ -98,7 +98,8 @@ export const logout = async (req, res) => {
 // SEND VERIFICATION OTP
 export const sendVerifyOtp = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.userId; // ✅ sahi - userAuth middleware se milta hai
+
     const user = await userModel.findById(userId);
     if (user.isAccountVerified) {
       return res.json({ success: false, message: 'Account is already verified' });
@@ -125,7 +126,9 @@ export const sendVerifyOtp = async (req, res) => {
 
 // VERIFY EMAIL
 export const verifyEmail = async (req, res) => {
-  const { userId, otp } = req.body;
+  const userId = req.userId;
+  const { otp } = req.body;
+
 
   if (!userId || !otp) {
     return res.json({ success: false, message: 'Missing Details' });
