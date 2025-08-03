@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema({
 
   resetOtp: { type: String, default: '' },
   resetOtpExpireAt: { type: Number, default: 0 }, // ✅ fixed
+  bio: { type: String, default: '' }, // ✨ Add this line
+
 });
 
 // ✅ fixed model reuse check

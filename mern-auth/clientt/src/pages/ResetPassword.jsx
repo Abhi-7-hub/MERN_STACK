@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { motion } from 'framer-motion';
 
 const ResetPassword = () => {
   const { backendUrl } = useContext(AppContext);
@@ -77,98 +78,163 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className='flex flex-col items-center justify-center min-h-screen gap-8 px-6 sm:px-0 bg-gradient-to-br from-blue-200 to-purple-400'>
-      <img
+    <div className='min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50'>
+      {/* Logo */}
+      <motion.img
         onClick={() => navigate('/')}
         src={assets.logo}
-        alt='Logo'
-        className='absolute left-5 sm:left-20 top-5 w-28 sm:w-32 cursor-pointer'
+        alt="Logo"
+        className='w-32 sm:w-40 cursor-pointer mb-8'
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.5 }}
       />
 
-      {!isEmailSent && (
-        <form className='bg-slate-900 p-8 rounded-lg shadow-lg w-96 text-sm' onSubmit={onSubmitEmail}>
-          <h1 className='text-2xl font-bold mb-3 text-center text-white'>Reset Password</h1>
-          <p className='text-gray-300 mb-6 text-center'>Enter your registered email to reset password.</p>
+      {/* Main Card */}
+      <motion.div 
+        className='bg-white p-8 rounded-xl shadow-2xl w-full max-w-md mx-4'
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        {!isEmailSent ? (
+          <>
+            {/* Email Request Form */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h2 className='text-3xl font-bold text-center mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
+                Reset Password
+              </h2>
+              <p className='text-gray-600 text-center mb-6'>
+                Enter your registered email to receive a reset code
+              </p>
 
-          <div className='mb-6 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]'>
-            <img src={assets.mail_icon} alt='Mail Icon' className='w-4 h-4' />
-            <input
-              type='email'
-              placeholder='Email ID'
-              className='flex-1 bg-transparent text-white placeholder-gray-400 outline-none'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+              <form onSubmit={onSubmitEmail} className='space-y-5'>
+                <div>
+                  <label className='block text-gray-700 mb-1'>Email</label>
+                  <div className='flex items-center border-b-2 border-gray-300 py-2'>
+                    <img src={assets.mail_icon} alt="Mail" className='h-5 w-5 text-gray-500 mr-2' />
+                    <input
+                      type='email'
+                      placeholder='Enter your email'
+                      className='w-full outline-none text-gray-700'
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
 
-          <button
-            type='submit'
-            className='w-full py-3 bg-gradient-to-r from-indigo-500 to-indigo-900 text-white rounded-full'
-          >
-            Send Reset Link
-          </button>
-        </form>
-      )}
+                <motion.button
+                  type='submit'
+                  className='w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300'
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Send Reset Code
+                </motion.button>
+              </form>
+            </motion.div>
+          </>
+        ) : !isOtpSubmitted ? (
+          <>
+            {/* OTP Verification Form */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h2 className='text-3xl font-bold text-center mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
+                Enter Verification Code
+              </h2>
+              <p className='text-gray-600 text-center mb-6'>
+                We sent a 6-digit code to {email}
+              </p>
 
-      {isEmailSent && !isOtpSubmitted && (
-        <form
-          className='bg-slate-900 p-8 rounded-lg shadow-lg w-96 text-sm'
-          onSubmit={onSubmitOTP}
-          onPaste={handlePaste}
-        >
-          <h1 className='text-2xl font-bold mb-3 text-center text-white'>Reset Password OTP</h1>
-          <p className='text-gray-300 mb-6 text-center'>Enter the 6-digit code sent to your email address.</p>
+              <form onSubmit={onSubmitOTP} onPaste={handlePaste} className='space-y-5'>
+                <div className='flex justify-between mb-6'>
+                  {Array(6).fill(0).map((_, index) => (
+                    <input
+                      key={index}
+                      type='text'
+                      maxLength='1'
+                      required
+                      className='w-12 h-12 border-2 border-gray-300 text-center text-xl rounded-md focus:border-blue-500 outline-none'
+                      ref={(el) => (inputRefs.current[index] = el)}
+                      onInput={(e) => handleInput(e, index)}
+                      onKeyDown={(e) => handleKeyDown(e, index)}
+                    />
+                  ))}
+                </div>
 
-          <div className='flex justify-between mb-8'>
-            {Array(6).fill(0).map((_, index) => (
-              <input
-                key={index}
-                type='text'
-                maxLength='1'
-                required
-                name={`otp-${index}`}
-                id={`otp-${index}`}
-                autoComplete='one-time-code'
-                className='w-12 h-12 bg-[#333A5C] text-white text-center text-xl rounded-md'
-                ref={(el) => (inputRefs.current[index] = el)}
-                onInput={(e) => handleInput(e, index)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-              />
-            ))}
-          </div>
+                <motion.button
+                  type='submit'
+                  className='w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300'
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Verify Code
+                </motion.button>
+              </form>
+            </motion.div>
+          </>
+        ) : (
+          <>
+            {/* New Password Form */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h2 className='text-3xl font-bold text-center mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
+                Create New Password
+              </h2>
+              <p className='text-gray-600 text-center mb-6'>
+                Enter a new password for your account
+              </p>
 
-          <button type='submit' className='w-full py-3 bg-gradient-to-r from-indigo-500 to-indigo-900 text-white rounded-full'>
-            Submit OTP
-          </button>
-        </form>
-      )}
+              <form onSubmit={onSubmitNewPassword} className='space-y-5'>
+                <div>
+                  <label className='block text-gray-700 mb-1'>New Password</label>
+                  <div className='flex items-center border-b-2 border-gray-300 py-2'>
+                    <img src={assets.lock_icon} alt="Lock" className='h-5 w-5 text-gray-500 mr-2' />
+                    <input
+                      type='password'
+                      placeholder='Enter new password'
+                      className='w-full outline-none text-gray-700'
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
 
-      {isOtpSubmitted && (
-        <form className='bg-slate-900 p-8 rounded-lg shadow-lg w-96 text-sm' onSubmit={onSubmitNewPassword}>
-          <h1 className='text-2xl font-bold mb-3 text-center text-white'>New Password</h1>
-          <p className='text-gray-300 mb-6 text-center'>Enter new password below.</p>
+                <motion.button
+                  type='submit'
+                  className='w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300'
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Reset Password
+                </motion.button>
+              </form>
+            </motion.div>
+          </>
+        )}
+      </motion.div>
 
-          <div className='mb-6 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]'>
-            <img src={assets.lock_icon} alt='Lock Icon' className='w-4 h-4' />
-            <input
-              type='password'
-              placeholder='New password'
-              className='flex-1 bg-transparent text-white placeholder-gray-400 outline-none'
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <button
-            type='submit'
-            className='w-full py-3 bg-gradient-to-r from-indigo-500 to-indigo-900 text-white rounded-full'
-          >
-            Reset Password
-          </button>
-        </form>
-      )}
+      {/* Footer */}
+      <motion.div 
+        className='mt-8 text-center text-gray-500 text-sm'
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 }}
+      >
+        © {new Date().getFullYear()} Speakly. All rights reserved.
+      </motion.div>
     </div>
   );
 };
