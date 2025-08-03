@@ -1,3 +1,5 @@
+// server.js or index.js
+
 import express from "express";
 import cors from "cors";
 import 'dotenv/config';
@@ -9,14 +11,19 @@ import postRouter from "./routes/postRoutes.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
+
+// ✅ Connect to MongoDB
 connectDB();
 
-// ✅ Allow both 5173 (main frontend) and 5175 (Postman/test frontend)
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5175'];
+// ✅ Allowed origins for CORS
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5175',
+  'http://localhost:5176',
+  'https://moonlit-monstera-9b97dc.netlify.app' // ✅ Netlify deployed frontend
+];
 
-app.use(express.json());
-app.use(cookieParser());
-
+// ✅ CORS config
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -25,14 +32,22 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true // ✅ Required for cookies
 }));
 
-// ✅ API Endpoints
+// ✅ Middleware
+app.use(express.json());
+app.use(cookieParser());
+
+// ✅ Health check route
 app.get('/', (req, res) => res.send("API Working Fine"));
 
+// ✅ Routes
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/posts', postRouter);
 
-app.listen(port, () => console.log(`Server started on PORT: ${port}`));
+// ✅ Start server
+app.listen(port, () => {
+  console.log(`Server started on PORT: ${port}`);
+});
