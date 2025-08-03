@@ -1,4 +1,4 @@
-// server.js or index.js
+// server.js
 
 import express from "express";
 import cors from "cors";
@@ -20,10 +20,10 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5175',
   'http://localhost:5176',
-  'https://moonlit-monstera-9b97dc.netlify.app' // ✅ Netlify deployed frontend
+  'https://moonlit-monstera-9b97dc.netlify.app'
 ];
 
-// ✅ CORS config
+// ✅ Place CORS at the TOP before anything else
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -32,14 +32,14 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true // ✅ Required for cookies
+  credentials: true
 }));
 
-// ✅ Middleware
-app.use(express.json());
+// ✅ Cookie parser and JSON body parser
 app.use(cookieParser());
+app.use(express.json());
 
-// ✅ Health check route
+// ✅ Health check
 app.get('/', (req, res) => res.send("API Working Fine"));
 
 // ✅ Routes
