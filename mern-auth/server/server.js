@@ -15,7 +15,7 @@ const port = process.env.PORT || 4000;
 // ✅ Connect to MongoDB
 connectDB();
 
-// ✅ Allowed origins for CORS
+// ✅ Allowed origins
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5175',
@@ -23,7 +23,7 @@ const allowedOrigins = [
   'https://moonlit-monstera-9b97dc.netlify.app'
 ];
 
-// ✅ Place CORS at the TOP before anything else
+// ✅ CORS Middleware
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -35,19 +35,19 @@ app.use(cors({
   credentials: true
 }));
 
-// ✅ Cookie parser and JSON body parser
+// ✅ Middlewares
 app.use(cookieParser());
 app.use(express.json());
 
-// ✅ Health check
+// ✅ Health Check
 app.get('/', (req, res) => res.send("API Working Fine"));
 
-// ✅ Routes
+// ✅ API Routes
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/posts', postRouter);
 
 // ✅ Start server
 app.listen(port, () => {
-  console.log(`Server started on PORT: ${port}`);
+  console.log(`✅ Server started on http://localhost:${port}`);
 });

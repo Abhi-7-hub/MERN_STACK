@@ -1,14 +1,15 @@
-import React from 'react'
-import { Routes, Route } from 'react-router-dom'
-import Home from './pages/Home'
-import Login from './pages/Login'
-import EmailVerify from './pages/EmailVerify'
-import ResetPassword from './pages/ResetPassword'
-import GeminiHome from './pages/GeminiHome'
-import Feed from './pages/Feed'
-import UserProfile from './pages/UserProfile'
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import EmailVerify from './pages/EmailVerify';
+import ResetPassword from './pages/ResetPassword';
+import GeminiHome from './pages/GeminiHome';
+import Feed from './pages/Feed';
+import UserProfile from './pages/UserProfile';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import CheckAuth from './components/CheckAuth'; // 🔐 Import auth checker
 
 const App = () => {
   return (
@@ -25,6 +26,10 @@ const App = () => {
         pauseOnHover
         theme="light"
       />
+
+      {/* 🔐 Auth check on app load */}
+      <CheckAuth />
+
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
@@ -35,7 +40,7 @@ const App = () => {
         <Route path='/user/:id' element={<UserProfile />} />
       </Routes>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
