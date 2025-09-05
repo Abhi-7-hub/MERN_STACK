@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
-import { assets } from '../assets/assets';
-import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
@@ -17,23 +16,14 @@ const Login = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-
     try {
       axios.defaults.withCredentials = true;
-
       let response;
 
       if (state === 'Sign Up') {
-        response = await axios.post(backendUrl + '/api/auth/register', {
-          name,
-          email,
-          password,
-        });
+        response = await axios.post(`${backendUrl}/api/auth/register`, { name, email, password });
       } else {
-        response = await axios.post(backendUrl + '/api/auth/login', {
-          email,
-          password,
-        });
+        response = await axios.post(`${backendUrl}/api/auth/login`, { email, password });
       }
 
       const { data } = response;
@@ -41,7 +31,7 @@ const Login = () => {
       if (data.success) {
         setIsLoggedin(true);
         getUserData();
-        navigate('/');
+        navigate('/feed');
       } else {
         toast.error(data.message || 'Something went wrong');
       }
@@ -52,107 +42,79 @@ const Login = () => {
   };
 
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50'>
-      {/* Logo */}
-      <motion.img
-        onClick={() => navigate('/')}
-        src={assets.logo}
-        alt="Logo"
-        className='w-32 sm:w-40 cursor-pointer mb-8'
-        initial={{ scale: 0.9 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.5 }}
-      />
-
-      {/* Main Card */}
-      <motion.div 
-        className='bg-white p-8 rounded-xl shadow-2xl w-full max-w-md mx-4'
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Title */}
-        <motion.h2 
-          className='text-3xl font-bold text-center mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[url('/bg_img.png')] bg-cover bg-center">
+      <div className="flex flex-col items-center justify-center bg-gradient-to-br from-black/70 via-gray-900/70 to-black/70 p-10 rounded-3xl shadow-2xl w-full max-w-md mx-4 backdrop-blur-sm">
+        {/* Heading */}
+        <motion.h2
+          className="text-4xl md:text-5xl font-extrabold text-white mb-4 text-center leading-tight drop-shadow-lg"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
         >
           {state === 'Sign Up' ? 'Join Speakly' : 'Welcome Back'}
         </motion.h2>
 
+        {/* Subtext */}
+        <motion.p
+          className="text-gray-300 text-center mb-8"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          Connect, share, and grow with your professional network.
+        </motion.p>
+
         {/* Form */}
-        <form onSubmit={onSubmitHandler} className='space-y-5'>
+        <form onSubmit={onSubmitHandler} className="w-full space-y-5">
           {state === 'Sign Up' && (
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
+            <motion.input
+              type="text"
+              placeholder="Full Name"
+              className="w-full px-4 py-3 rounded-lg outline-none text-gray-900 placeholder-gray-500"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
-            >
-              <label className='block text-gray-700 mb-1'>Full Name</label>
-              <div className='flex items-center border-b-2 border-gray-300 py-2'>
-                <img src={assets.person_icon} alt="Person" className='h-5 w-5 text-gray-500 mr-2' />
-                <input
-                  type='text'
-                  placeholder='Enter your name'
-                  className='w-full outline-none text-gray-700'
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-            </motion.div>
+            />
           )}
 
-          <motion.div
-            initial={{ opacity: 0, x: -10 }}
+          <motion.input
+            type="email"
+            placeholder="Email"
+            className="w-full px-4 py-3 rounded-lg outline-none text-gray-900 placeholder-gray-500"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: state === 'Sign Up' ? 0.4 : 0.3 }}
-          >
-            <label className='block text-gray-700 mb-1'>Email</label>
-            <div className='flex items-center border-b-2 border-gray-300 py-2'>
-              <img src={assets.mail_icon} alt="Mail" className='h-5 w-5 text-gray-500 mr-2' />
-              <input
-                type='email'
-                placeholder='Enter your email'
-                className='w-full outline-none text-gray-700'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-          </motion.div>
+          />
 
-          <motion.div
-            initial={{ opacity: 0, x: -10 }}
+          <motion.input
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-3 rounded-lg outline-none text-gray-900 placeholder-gray-500"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: state === 'Sign Up' ? 0.5 : 0.4 }}
-          >
-            <label className='block text-gray-700 mb-1'>Password</label>
-            <div className='flex items-center border-b-2 border-gray-300 py-2'>
-              <img src={assets.lock_icon} alt="Lock" className='h-5 w-5 text-gray-500 mr-2' />
-              <input
-                type='password'
-                placeholder='Enter your password'
-                className='w-full outline-none text-gray-700'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-          </motion.div>
+          />
 
           {state === 'Login' && (
             <motion.div
-              className='text-right'
+              className="text-right"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
               <button
-                type='button'
+                type="button"
                 onClick={() => navigate('/reset-password')}
-                className='text-sm text-blue-600 hover:underline'
+                className="text-sm text-blue-400 hover:underline"
               >
                 Forgot password?
               </button>
@@ -160,10 +122,8 @@ const Login = () => {
           )}
 
           <motion.button
-            type='submit'
-            className='w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300'
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            type="submit"
+            className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: state === 'Sign Up' ? 0.6 : 0.5 }}
@@ -172,39 +132,39 @@ const Login = () => {
           </motion.button>
         </form>
 
-        <motion.div 
-          className='mt-6 text-center'
+        <motion.div
+          className="mt-6 text-center text-gray-200"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
         >
           {state === 'Sign Up' ? (
-            <p className='text-gray-600'>
+            <p>
               Already have an account?{' '}
               <button
                 onClick={() => setState('Login')}
-                className='text-blue-600 font-medium hover:underline'
+                className="text-blue-400 font-medium hover:underline"
               >
-                Login here
+                Login
               </button>
             </p>
           ) : (
-            <p className='text-gray-600'>
+            <p>
               Don't have an account?{' '}
               <button
                 onClick={() => setState('Sign Up')}
-                className='text-blue-600 font-medium hover:underline'
+                className="text-blue-400 font-medium hover:underline"
               >
-                Sign up
+                Sign Up
               </button>
             </p>
           )}
         </motion.div>
-      </motion.div>
+      </div>
 
       {/* Footer */}
-      <motion.div 
-        className='mt-8 text-center text-gray-500 text-sm'
+      <motion.div
+        className="mt-8 text-center text-gray-300 text-sm"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8 }}

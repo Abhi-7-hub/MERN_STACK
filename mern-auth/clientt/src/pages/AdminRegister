@@ -1,0 +1,93 @@
+// src/pages/AdminRegister.jsx
+import React, { useState, useContext } from "react";
+import axios from "axios";
+import { AppContext } from "../context/AppContext";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
+const AdminRegister = () => {
+  const { backendUrl } = useContext(AppContext);
+  const navigate = useNavigate();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    try {
+      const { data } = await axios.post(
+        `${backendUrl}/api/admin/register`,
+        { name, email, password },
+        { withCredentials: true }
+      );
+
+      if (data.success) {
+        toast.success("Admin registered successfully!");
+        navigate("/admin-login"); // redirect to login
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Registration failed!");
+    }
+  };
+
+  return (
+    <div className="flex justify-center items-center h-screen bg-gray-100">
+      <form
+        onSubmit={handleRegister}
+        className="bg-white shadow-lg rounded-lg p-6 w-96"
+      >
+        <h2 className="text-2xl font-bold mb-4 text-center">Admin Registration</h2>
+
+        <input
+          type="text"
+          placeholder="Full Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full mb-3 p-2 border rounded"
+          required
+        />
+
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full mb-3 p-2 border rounded"
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full mb-3 p-2 border rounded"
+          required
+        />
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
+          Register
+        </button>
+
+        <p className="text-xs text-gray-500 mt-3 text-center">
+          Already have an account?{" "}
+          <span
+            className="text-blue-600 cursor-pointer font-medium"
+            onClick={() => navigate("/admin-login")}
+          >
+            Login
+          </span>
+        </p>
+      </form>
+    </div>
+  );
+};
+
+export default AdminRegister;

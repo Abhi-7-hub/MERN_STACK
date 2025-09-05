@@ -1,57 +1,75 @@
+import React, { createContext, useEffect, useState } from "react";
 import axios from "axios";
-import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-// ✅ Create the actual context
 export const AppContext = createContext();
 
-export const AppContextProvider = (props) => {
+export const AppContextProvider = ({ children }) => {
+  const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
+  axios.defaults.withCredentials = true;
 
-    axios.defaults.withCredentials=true;
-
-
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [isLoggedin, setIsLoggedin] = useState(false);
-  const [userData, setUserData] = useState(null); // better than false
-  const getAuthsState=async()=>{
+  const [userData, setUserData] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false); // NEW: Track auth check status
+
+  const getUserData = async () => {
     try {
-        const {data}=await axios.get(backendUrl+ '/api/auth/is-auth')
-        if(data.success){
-            setIsLoggedin(true)
-            getUserData()
-        }
+      const { data } = await axios.get(`${backendUrl}/api/user/data`, { 
+        withCredentials: true 
+      });
+      if (data.success) {
+        setUserData(data.user);
+        setIsLoggedin(true);
+      } else {
+        setUserData(null);
+        setIsLoggedin(false);
+      }
     } catch (error) {
-        toast.error(error.message)
-        
+      console.error("Failed to get user data:", error);
+      setUserData(null);
+      setIsLoggedin(false);
     }
-  }
-
-  const getUserData=async()=>{
-    try {
-        const {data}=await axios.get(backendUrl+ '/api/user/data')
-        data.success?setUserData(data.userData):toast.error(data.message)  
-    } catch (error) {
-        toast.error(error.response?.data?.message || "Something went wrong")
-
-    }
-  }
-
-  useEffect(()=>{
-    getAuthsState()
-  },[])
-
-  const value = {
-    backendUrl,
-    isLoggedin,
-    setIsLoggedin,
-    userData,
-    setUserData,
-    getUserData
   };
 
+  const getAuthsState = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/auth/is-auth`, { 
+        withCredentials: true 
+      });
+      
+      if (data.success && data.user) {
+        setUserData(data.user);
+        setIsLoggedin(true);
+      } else {
+        setUserData(null);
+        setIsLoggedin(false);
+      }
+    } catch (error) {
+      console.error("Auth check error:", error);
+      setUserData(null);
+      setIsLoggedin(false);
+    } finally {
+      setAuthChecked(true); // Mark auth check as complete
+    }
+  };
+
+  useEffect(() => {
+    getAuthsState();
+  }, []);
+
   return (
-    <AppContext.Provider value={value}>
-      {props.children}
+    <AppContext.Provider
+      value={{
+        backendUrl,
+        isLoggedin,
+        setIsLoggedin,
+        userData,
+        setUserData,
+        getUserData,
+        authChecked // NEW: Export authChecked state
+      }}
+    >
+      {children}
     </AppContext.Provider>
   );
 };
