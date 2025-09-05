@@ -1,16 +1,30 @@
-import express from 'express'
-import { isAuthenticated, login, logout, register, resetPassword, sendResetOtp, sendVerifyOtp, verifyEmail } from '../controllers/authController.js';
-import userAuth from '../middleware/userAuth.js';
+// routes/authroutes.js
+import express from 'express';
+import { 
+  register, 
+  login, 
+  logout, 
+  sendVerifyOtp, 
+  verifyEmail, 
+  sendResetOtp, 
+  resetPassword, 
+  isAuthenticated 
+} from '../controllers/authController.js';
+import { userAuth } from '../middleware/userAuth.js';
 
-const authRoutes = express.Router();
+const router = express.Router();
 
-authRoutes.post('/register', register)
-authRoutes.post('/login', login)
-authRoutes.post('/logout', logout)
-authRoutes.post('/send-verify-otp', userAuth, sendVerifyOtp);
-authRoutes.post('/verify-account', userAuth, verifyEmail);
-authRoutes.get('/is-auth', userAuth, isAuthenticated);
-authRoutes.post('/send-reset-otp', sendResetOtp)
-authRoutes.post('/reset-password', resetPassword)
+// Public routes
+router.post('/register', register);
+router.post('/login', login);
+router.post('/send-reset-otp', sendResetOtp);
+router.post('/reset-password', resetPassword);
 
-export default authRoutes;
+// Protected routes (require valid token)
+router.get('/logout', userAuth, logout);
+router.get('/me', userAuth, isAuthenticated); // ✅ frontend auth check
+router.get('/is-auth', userAuth, isAuthenticated); // ✅ optional alias
+router.post('/send-verify-otp', userAuth, sendVerifyOtp);
+router.post('/verify-email', userAuth, verifyEmail);
+
+export default router;

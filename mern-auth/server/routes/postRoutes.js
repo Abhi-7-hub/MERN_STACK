@@ -6,7 +6,7 @@ import {
   getUserPosts, 
   deletePost 
 } from '../controllers/postController.js';
-import userAuth from '../middleware/userAuth.js';
+import { userAuth } from '../middleware/userAuth.js'; // ✅ Corrected import
 
 const postRouter = express.Router();
 

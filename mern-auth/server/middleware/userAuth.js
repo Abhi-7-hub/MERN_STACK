@@ -1,25 +1,29 @@
 import jwt from 'jsonwebtoken';
 
-const userAuth = async (req, res, next) => {
+// ✅ General user/auth middleware
+export const userAuth = (req, res, next) => {
   const { token } = req.cookies;
 
   if (!token) {
-    return res.json({ success: false, message: 'Not Authorized. Login Again' });
+    return res.status(401).json({ success: false, message: 'Not authorized. Login again' });
   }
 
   try {
-    const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (tokenDecode?.id) {
-    req.userId = tokenDecode.id;
-      next();
-    } else {
-      return res.json({ success: false, message: 'Not Authorized. Login Again' });
-    }
-
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.userId = decoded.id;
+    req.userRole = decoded.role; // role bhi set ho raha hai
+    next();
   } catch (error) {
-    return res.json({ success: false, message: error.message });
+    return res.status(401).json({ success: false, message: 'Invalid or expired token. Login again' });
   }
 };
 
-export default userAuth;
+// ✅ Admin only middleware
+export const adminAuth = (req, res, next) => {
+  userAuth(req, res, () => {
+    if (req.userRole !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Access denied. Admins only' });
+    }
+    next();
+  });
+};
